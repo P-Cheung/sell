@@ -33,6 +33,9 @@
       <div class="detail-wrapper clearfix">
         <div class="detail-main">
           <h1 class="name">{{seller.name}}</h1>
+          <div class="star-wrapper">
+            <star :size="48" :score="seller.score"></star>
+          </div>
         </div>
       </div>
       <div class="detail-close" @click="clickDetail">
@@ -43,8 +46,12 @@
 </template>
 
 <script>
+import Star from '@/common/star/Star'
 export default {
   name: 'sellerHeader',
+  components: {
+    Star
+  },
   props: {
     seller: Object
   },
@@ -204,6 +211,10 @@ export default {
           font-weight 700
           line-height .32rem
           text-align center
+        .star-wrapper
+          text-align center
+          margin .32rem auto .56rem
+          padding .04rem 0
     .detail-close
       // position relative
       width .64rem
