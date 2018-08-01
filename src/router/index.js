@@ -1,0 +1,35 @@
+import Vue from 'vue'
+import Router from 'vue-router'
+import Seller from '@/pages/seller/Seller'
+import Goods from '@/pages/seller/components/goods/Goods'
+import Rating from '@/pages/seller/components/rating/Rating'
+import Store from '@/pages/seller/components/store/Store'
+
+Vue.use(Router)
+
+export default new Router({
+  routes: [
+    {
+      path: '/',
+      name: 'Seller',
+      component: Seller,
+      children: [
+        {
+          path: 'goods',
+          name: 'SellerGoods',
+          component: Goods
+        },
+        {
+          path: 'rating',
+          name: 'SellerRating',
+          component: Rating
+        },
+        {
+          path: 'store',
+          name: 'SellerStore',
+          component: Store
+        }
+      ]
+    }
+  ]
+})
