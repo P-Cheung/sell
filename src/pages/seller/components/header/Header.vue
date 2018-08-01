@@ -17,17 +17,27 @@
           <span class="text">{{seller.supports[0].description}}</span>
         </div>
       </div>
-      <div class="supports-count" v-if="this.seller.supports">
+      <div class="supports-count" v-if="seller.supports" @click="clickDetail">
         <span class="count">{{supportsLength}}个</span>
         <i class="icon-keyboard_arrow_right"></i>
       </div>
     </div>
-    <div class="bulletin-wrapper">
+    <div class="bulletin-wrapper" @click="clickDetail">
       <span class="bulletin-title"></span><span class="bulletin-content">{{seller.bulletin}}</span>
       <i class="icon-keyboard_arrow_right"></i>
     </div>
     <div class="background">
       <img :src="seller.avatar" width="100%" height="100%">
+    </div>
+    <div class="detail" v-show="showDetail">
+      <div class="detail-wrapper clearfix">
+        <div class="detail-main">
+          <h1 class="name">{{seller.name}}</h1>
+        </div>
+      </div>
+      <div class="detail-close" @click="clickDetail">
+        <i class="icon-close"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -40,12 +50,19 @@ export default {
   },
   data () {
     return {
-      iconMap: ['decrease', 'discount', 'special', 'invoice', 'guarantee']
+      iconMap: ['decrease', 'discount', 'special', 'invoice', 'guarantee'],
+      showDetail: false
     }
   },
   computed: {
     supportsLength () {
       return this.seller.supports.length
+    }
+  },
+  methods: {
+    clickDetail () {
+      console.log('click')
+      this.showDetail = !this.showDetail
     }
   }
 }
@@ -57,6 +74,7 @@ export default {
   position relative
   color rgb(255,255,255)
   background rgba(7, 17, 27, 0.5)
+  overflow hidden
   .content-wrapper
     position relative
     font-size 0
@@ -165,4 +183,32 @@ export default {
     width 100%
     height 100%
     filter blur(10px)
+  .detail
+    position fixed
+    top 0
+    left 0
+    z-index 100
+    height 100%
+    width 100%
+    overflow auto
+    background rgba(7, 17, 27, 0.8)
+    // filter blur(10px)
+    .detail-wrapper
+      min-height 100%
+      width 100%
+      .detail-main
+        margin 1.28rem .72rem 0
+        padding-bottom 1.28rem
+        .name
+          font-size .32rem
+          font-weight 700
+          line-height .32rem
+          text-align center
+    .detail-close
+      // position relative
+      width .64rem
+      height .64rem
+      margin -1.28rem auto 0 auto
+      clear both
+      font-size .64rem
 </style>
