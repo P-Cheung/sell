@@ -29,19 +29,41 @@
     <div class="background">
       <img :src="seller.avatar" width="100%" height="100%">
     </div>
-    <div class="detail" v-show="showDetail">
-      <div class="detail-wrapper clearfix">
-        <div class="detail-main">
-          <h1 class="name">{{seller.name}}</h1>
-          <div class="star-wrapper">
-            <star :size="48" :score="seller.score"></star>
+    <transition>
+      <div class="detail" v-show="showDetail">
+        <div class="detail-wrapper clearfix">
+          <div class="detail-main">
+            <h1 class="name">{{seller.name}}</h1>
+            <div class="star-wrapper">
+              <star :size="48" :score="seller.score"></star>
+            </div>
+            <div class="title">
+              <div class="line"></div>
+              <div class="text">优惠信息</div>
+              <div class="line"></div>
+            </div>
+            <ul class="supports" v-if="seller.supports">
+              <li class="supports-item"
+                v-for="(item, index) in seller.supports"
+                :key="index"
+              >
+                <span class="icon" :class="iconMap[seller.supports[index].type]"></span>
+                <span class="text">{{seller.supports[index].description}}</span>
+              </li>
+            </ul>
+            <div class="title">
+              <div class="line"></div>
+              <div class="text">商家公告</div>
+              <div class="line"></div>
+            </div>
+            <div class="content">{{seller.bulletin}}</div>
           </div>
         </div>
+        <div class="detail-close" @click="clickDetail">
+          <i class="icon-close"></i>
+        </div>
       </div>
-      <div class="detail-close" @click="clickDetail">
-        <i class="icon-close"></i>
-      </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -77,6 +99,7 @@ export default {
 
 <style lang='stylus' scoped>
 @import '~styles/mixin.styl'
+
 .header
   position relative
   color rgb(255,255,255)
@@ -199,7 +222,11 @@ export default {
     width 100%
     overflow auto
     background rgba(7, 17, 27, 0.8)
-    // filter blur(10px)
+    backdrop-filter blur(10px) // ios下实现
+    &.v-enter, &.v-leave-to
+      opacity 0
+    &.v-enter-active, &.v-leave-active
+      transition opacity .5s
     .detail-wrapper
       min-height 100%
       width 100%
@@ -213,8 +240,56 @@ export default {
           text-align center
         .star-wrapper
           text-align center
-          margin .32rem auto .56rem
+          margin .32rem auto 0
           padding .04rem 0
+        .title
+          display flex
+          width 100%
+          margin .56rem auto .48rem
+          .text
+            font-size .28rem
+            font-weight 700
+            line-height .28rem
+            margin 0 .24rem
+          .line
+            position relative
+            top -.12rem
+            flex 1
+            border-bottom 1px solid rgba(255, 255, 255, .2)
+        .supports
+          margin 0 .24rem
+          .supports-item
+            font-size 0
+            padding-bottom .24rem
+            &:last-child
+              padding-bottom 0
+            .icon
+              display inline-block
+              height .32rem
+              width .32rem
+              background-size .32rem .32rem
+              vertical-align top
+              backgeound-repeat no-repeat
+              &.decrease
+                bg-image('decrease_2')
+              &.discount
+                bg-image('discount_2')
+              &.special
+                bg-image('special_2')
+              &.invoice
+                bg-image('invoice_2')
+              &.guarantee
+                bg-image('guarantee_2')
+            .text
+              font-size .24rem
+              line-height .32rem
+              font-weight 200
+              padding-left .12rem
+        .content
+          padding 0 .24rem
+          font-size .24rem
+          line-height .48rem
+          font-weight 200
     .detail-close
       // position relative
       width .64rem
@@ -222,4 +297,6 @@ export default {
       margin -1.28rem auto 0 auto
       clear both
       font-size .64rem
+      .icon-close
+        color rgba(255, 255, 255, 0.5)
 </style>
