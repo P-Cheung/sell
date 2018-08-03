@@ -3,7 +3,7 @@ import Router from 'vue-router'
 import Seller from '@/pages/seller/Seller'
 import Goods from '@/pages/seller/components/goods/Goods'
 import Rating from '@/pages/seller/components/rating/Rating'
-import Store from '@/pages/seller/components/store/Store'
+import Restaurant from '@/pages/seller/components/restaurant/Restaurant'
 
 Vue.use(Router)
 
@@ -25,9 +25,9 @@ export default new Router({
           component: Rating
         },
         {
-          path: 'store',
-          name: 'SellerStore',
-          component: Store
+          path: 'restaurant',
+          name: 'SellerRestaurant',
+          component: Restaurant
         }
       ]
     }

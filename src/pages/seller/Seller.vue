@@ -4,7 +4,7 @@
     <div class="nav border-bottom">
       <router-link class="nav-item" to="goods">商品</router-link>
       <router-link class="nav-item" to="rating">评价</router-link>
-      <router-link class="nav-item" to="store">商家</router-link>
+      <router-link class="nav-item" to="restaurant">商家</router-link>
     </div>
     <keep-alive>
       <router-view></router-view>
