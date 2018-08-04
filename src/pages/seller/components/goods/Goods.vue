@@ -12,7 +12,30 @@
         </li>
       </ul>
     </div>
-    <div class="goods-wrapper"></div>
+    <div class="goods-wrapper">
+      <ul>
+        <li class="foodlist" v-for="(item, index) in goods" :key="index">
+          <h1 class="title border-left">{{item.name}}</h1>
+          <ul>
+            <li class="food-item border-bottom" v-for="(food, index) in item.foods" :key="index">
+              <div class="icon">
+                <img width="57" height="57" :src="food.icon">
+              </div>
+              <div class="content">
+                <h2 class="name">{{food.name}}</h2>
+                <p class="desc">{{food.description}}</p>
+                <div class="extra">
+                  <span class="count">月售{{food.sellCount}}份</span><span>好评率{{food.rating}}%</span>
+                </div>
+                <div class="price">
+                  <span class="new">￥<span class="num">{{food.price}}</span></span><span v-if="food.oldPrice" class="old">￥<span class="num">{{food.oldPrice}}</span></span>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -51,6 +74,10 @@ export default {
 .border-bottom
   &:before
     border-color rgba(7, 17, 27, 0.1)
+.border-left
+  &:before
+    border-color #d9dde1
+    border-width 2px
 .goods
   display flex
   position absolute
@@ -95,4 +122,58 @@ export default {
             bg-image('decrease_3')
   .goods-wrapper
     flex 1
+    .title
+      height .52rem
+      background #f3f5f7
+      padding-left .28rem
+      font-size .24rem
+      color rgb(147, 153, 159)
+      line-height .52rem
+    .food-item
+      display flex
+      margin .36rem
+      padding-bottom .36rem
+      &:last-child
+        &:before
+          border-width 0
+      .icon
+        flex 0 0 1.14rem
+        margin-right .2rem
+      .content
+        flex 1
+        .name
+          margin-top .04rem
+          font-size .28rem
+          height .28rem
+          line-height .28rem
+          color rgb(7, 17, 27)
+        .desc
+          margin .16rem 0 .16rem 0
+          font-size .2rem
+          line-height .2rm
+          color rgb(147, 153, 159)
+        .extra
+          font-size .2rem
+          line-height .2rm
+          color rgb(147, 153, 159)
+          .count
+            padding-right .24rem
+        .price
+          .new
+            font-size .2rem
+            color rgb(240, 20, 20)
+            font-weight normal
+            line-height .48rem
+            margin-right .16rem
+            .num
+              font-size .28rem
+              font-weight 700
+          .old
+            text-decoration line-through
+            font-size .2rem
+            color rgb(147, 153, 159)
+            font-weight normal
+            line-height .48rem
+            .num
+              font-weight 700
 </style>

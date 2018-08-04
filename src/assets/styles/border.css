@@ -180,3 +180,6 @@
         transform: scaleX(.33333);
     }
 }
+.border-none::before {
+  display: none
+}

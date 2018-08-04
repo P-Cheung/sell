@@ -28,6 +28,10 @@ export default new Router({
           path: 'restaurant',
           name: 'SellerRestaurant',
           component: Restaurant
+        },
+        {
+          path: '',
+          redirect: 'goods'
         }
       ]
     }
