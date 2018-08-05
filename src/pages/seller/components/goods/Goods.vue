@@ -1,10 +1,12 @@
 <template>
   <div class="goods">
-    <div class="menu-wrapper">
+    <div class="menu-wrapper" ref="menuWrapper">
       <ul>
         <li class="menu-item"
           v-for="(item, index) of goods"
           :key="index"
+          :class="{'current': index === currentIndex}"
+          @click="clickMenu(index)"
         >
           <span class="text border-bottom">
             <span class="icon" v-if="item.type>0" :class="iconMap[item.type]"></span>{{item.name}}
@@ -12,9 +14,9 @@
         </li>
       </ul>
     </div>
-    <div class="goods-wrapper">
+    <div class="goods-wrapper" ref="goodsWrapper">
       <ul>
-        <li class="foodlist" v-for="(item, index) in goods" :key="index">
+        <li class="foodlist foodlist-hook" v-for="(item, index) in goods" :key="index">
           <h1 class="title border-left">{{item.name}}</h1>
           <ul>
             <li class="food-item border-bottom" v-for="(food, index) in item.foods" :key="index">
@@ -41,6 +43,7 @@
 
 <script>
 import axios from 'axios'
+import BScroll from 'better-scroll'
 export default {
   name: 'sellerGoods',
   props: {
@@ -49,7 +52,21 @@ export default {
   data () {
     return {
       iconMap: ['decrease', 'discount', 'special', 'invoice', 'guarantee'],
-      goods: {}
+      goods: {},
+      scrollHeight: [],
+      scrollY: 0,
+      foodlist: []
+    }
+  },
+  computed: {
+    currentIndex () {
+      for (let i = 0; i < this.scrollHeight.length; i++) {
+        let height1 = this.scrollHeight[i]
+        let height2 = this.scrollHeight[i + 1]
+        if (!height2 || (height1 <= this.scrollY && height2 > this.scrollY)) {
+          return i
+        }
+      }
     }
   },
   mounted () {
@@ -63,7 +80,36 @@ export default {
       res = res.data
       if (res.ret && res.data) {
         this.goods = res.data.goods
+        this.$nextTick(() => { // 保证数据已获取并渲染
+          this._initScroll()
+          this._caculateHeight()
+        })
       }
+    },
+    _initScroll () {
+      this.menuScroll = new BScroll(this.$refs.menuWrapper, {
+        click: true
+      })
+      this.goodsScroll = new BScroll(this.$refs.goodsWrapper, {
+        probeType: 3
+      })
+      this.goodsScroll.on('scroll', (pos) => {
+        this.scrollY = Math.abs(Math.round(pos.y))
+      })
+    },
+    _caculateHeight () {
+      let foodlist = this.$refs.goodsWrapper.getElementsByClassName('foodlist-hook')
+      this.foodlist = foodlist
+      let height = 0
+      this.scrollHeight.push(height)
+      for (let i = 0; i < foodlist.length; i++) {
+        height += foodlist[i].clientHeight
+        this.scrollHeight.push(height)
+      }
+    },
+    clickMenu (index) {
+      this.goodsScroll.scrollToElement(this.foodlist[index], 300)
+      // console.log(index)
     }
   }
 }
@@ -100,7 +146,6 @@ export default {
         font-size .24rem
         width 1.12rem
         vertical-align middle
-        // color rgb(240, 20, 20)
         font-weight 200
         .icon
           display inline-block
@@ -120,6 +165,15 @@ export default {
             bg-image('guarantee_3')
           &.decrease
             bg-image('decrease_3')
+      &.current
+        position relative
+        margin-top -1px
+        z-index 10
+        background #fff
+        .text
+          font-weight 700
+          &.border-bottom:before
+            border-width 0
   .goods-wrapper
     flex 1
     .title
@@ -136,6 +190,7 @@ export default {
       &:last-child
         &:before
           border-width 0
+        margin-bottom 0
       .icon
         flex 0 0 1.14rem
         margin-right .2rem
@@ -150,11 +205,11 @@ export default {
         .desc
           margin .16rem 0 .16rem 0
           font-size .2rem
-          line-height .2rm
+          line-height .24rem
           color rgb(147, 153, 159)
         .extra
           font-size .2rem
-          line-height .2rm
+          line-height .2rem
           color rgb(147, 153, 159)
           .count
             padding-right .24rem
