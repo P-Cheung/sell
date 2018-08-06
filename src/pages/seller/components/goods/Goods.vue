@@ -38,21 +38,24 @@
         </li>
       </ul>
     </div>
+    <shopcart :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice"></shopcart>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 import BScroll from 'better-scroll'
+import shopcart from '../shopcart/ShopCart'
 export default {
   name: 'sellerGoods',
-  props: {
-    seller: Object
+  components: {
+    shopcart
   },
   data () {
     return {
       iconMap: ['decrease', 'discount', 'special', 'invoice', 'guarantee'],
       goods: {},
+      seller: {},
       scrollHeight: [],
       scrollY: 0,
       foodlist: []
@@ -80,6 +83,7 @@ export default {
       res = res.data
       if (res.ret && res.data) {
         this.goods = res.data.goods
+        this.seller = res.data.seller
         this.$nextTick(() => { // 保证数据已获取并渲染
           this._initScroll()
           this._caculateHeight()
