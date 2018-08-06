@@ -32,13 +32,16 @@
                 <div class="price">
                   <span class="new">￥<span class="num">{{food.price}}</span></span><span v-if="food.oldPrice" class="old">￥<span class="num">{{food.oldPrice}}</span></span>
                 </div>
+                <div class="cartcontrol-wrapper">
+                  <cart-control class="cartcontrol" :food="food"></cart-control>
+                </div>
               </div>
             </li>
           </ul>
         </li>
       </ul>
     </div>
-    <shopcart :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice"></shopcart>
+    <shopcart :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice" :selected-foods="selectedFoods"></shopcart>
   </div>
 </template>
 
@@ -46,15 +49,17 @@
 import axios from 'axios'
 import BScroll from 'better-scroll'
 import shopcart from '../shopcart/ShopCart'
+import CartControl from '../cartcontrol/CartControl'
 export default {
   name: 'sellerGoods',
   components: {
-    shopcart
+    shopcart,
+    CartControl
   },
   data () {
     return {
       iconMap: ['decrease', 'discount', 'special', 'invoice', 'guarantee'],
-      goods: {},
+      goods: [],
       seller: {},
       scrollHeight: [],
       scrollY: 0,
@@ -70,6 +75,17 @@ export default {
           return i
         }
       }
+    },
+    selectedFoods () {
+      let foods = []
+      this.goods.forEach(good => {
+        good.foods.forEach(item => {
+          if (item.count) {
+            foods.push(item)
+          }
+        })
+      })
+      return foods
     }
   },
   mounted () {
@@ -95,7 +111,8 @@ export default {
         click: true
       })
       this.goodsScroll = new BScroll(this.$refs.goodsWrapper, {
-        probeType: 3
+        probeType: 3,
+        click: true
       })
       this.goodsScroll.on('scroll', (pos) => {
         this.scrollY = Math.abs(Math.round(pos.y))
@@ -199,6 +216,7 @@ export default {
         flex 0 0 1.14rem
         margin-right .2rem
       .content
+        // display relative
         flex 1
         .name
           margin-top .04rem
@@ -235,4 +253,8 @@ export default {
             line-height .48rem
             .num
               font-weight 700
+        .cartcontrol-wrapper
+          position absolute
+          right 0
+          bottom .24rem
 </style>

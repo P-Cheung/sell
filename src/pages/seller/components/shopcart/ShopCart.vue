@@ -30,7 +30,7 @@ export default {
       type: Number,
       default: 0
     },
-    selectedGoods: {
+    selectedFoods: {
       type: Array,
       default () {
         return []
@@ -40,14 +40,14 @@ export default {
   computed: {
     totalPrice () {
       let total = 0
-      this.selectedGoods.forEach(item => {
+      this.selectedFoods.forEach(item => {
         total += item.price * item.count
       })
       return total
     },
     totalCount () {
       let count = 0
-      this.selectedGoods.forEach(item => {
+      this.selectedFoods.forEach(item => {
         count += item.count
       })
       return count
