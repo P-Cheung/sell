@@ -1,33 +1,64 @@
 <template>
-  <div class="shopcart">
-    <div class="content">
-      <div class="content-left">
-        <div class="logo-wrapper">
-          <div class="logo" :class="{'highlight': totalCount>0}">
-            <i class="icon-shopping_cart"></i>
+  <div>
+    <div class="shopcart">
+      <div class="content" @click="toggleList">
+        <div class="content-left">
+          <div class="logo-wrapper">
+            <div class="logo" :class="{'highlight': totalCount>0}">
+              <i class="icon-shopping_cart"></i>
+            </div>
+            <div class="count" v-if="totalCount">{{totalCount}}</div>
           </div>
-          <div class="count" v-if="totalCount">{{totalCount}}</div>
+          <div class="price" :class="{'highlight': totalPrice>0}">￥{{totalPrice}}</div>
+          <div class="desc">另需配送费￥{{deliveryPrice}}元</div>
         </div>
-        <div class="price" :class="{'highlight': totalPrice>0}">￥{{totalPrice}}</div>
-        <div class="desc">另需配送费￥{{deliveryPrice}}元</div>
-      </div>
-      <div class="content-right">
-        <div class="pay" :class="payClass">{{payDesc}}</div>
-      </div>
-    </div>
-    <div class="ball-wrapper">
-      <transition-group name="drop" @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter">
-        <div class="ball" v-for="(ball, index) in balls" :key="index" v-show="ball.show">
-          <div class="inner inner-hook"></div>
+        <div class="content-right" @click.stop.prevent="goToPay">
+          <div class="pay" :class="payClass">{{payDesc}}</div>
         </div>
-      </transition-group>
+      </div>
+      <div class="ball-wrapper">
+        <transition-group name="drop" @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter">
+          <div class="ball" v-for="(ball, index) in balls" :key="index" v-show="ball.show">
+            <div class="inner inner-hook"></div>
+          </div>
+        </transition-group>
+      </div>
+      <transition name="fold">
+        <div class="shopcart-list" v-show="showlist">
+          <div class="list-header">
+            <h1 class="title">购物车</h1>
+            <span class="empty" @click="empty">清空</span>
+          </div>
+          <div class="list-content" ref="shopcartlist">
+            <ul>
+              <li class="food-item border-bottom" v-for="(food, index) in selectedFoods" :key="index">
+                <span class="name">{{food.name}}</span>
+                <div class="price-wrapper">
+                  <span class="price">￥<span class="num">{{food.price*food.count}}</span></span>
+                </div>
+                <div class="cartcontrol-wrapper">
+                  <cartcontrol :food="food"></cartcontrol>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </transition>
     </div>
+    <transition name="fade">
+      <div class="list-mask" v-show="showlist" @click="fold=true"></div>
+    </transition>
   </div>
 </template>
 
 <script>
+import cartcontrol from '../cartcontrol/CartControl'
+import BScroll from 'better-scroll'
 export default {
   name: 'ShopCart',
+  components: {
+    cartcontrol
+  },
   props: {
     deliveryPrice: {
       type: Number,
@@ -53,7 +84,8 @@ export default {
         {show: false},
         {show: false}
       ],
-      dropBalls: []
+      dropBalls: [],
+      fold: true
     }
   },
   computed: {
@@ -83,6 +115,13 @@ export default {
     },
     payClass () {
       return this.totalPrice < this.minPrice ? 'not-enough' : 'enough'
+    },
+    showlist () {
+      if (!this.totalCount) {
+        return false
+      } else {
+        return !this.fold
+      }
     }
   },
   methods: {
@@ -134,12 +173,41 @@ export default {
         ball.show = false
         el.style.display = 'none'
       }
+    },
+    toggleList () {
+      this.fold = !this.fold
+      if (!this.fold) {
+        this.$nextTick(() => {
+          if (!this.scroll) {
+            this.scroll = new BScroll(this.$refs.shopcartlist, {
+              click: true
+            })
+          } else {
+            this.scroll.refresh()
+          }
+        })
+      }
+    },
+    empty () {
+      this.selectedFoods.forEach(item => {
+        item.count = 0
+      })
+      this.fold = true
+    },
+    goToPay () {
+      if (this.totalPrice < this.minPrice) {
+        return
+      }
+      alert(`pay ￥${this.totalPrice}`)
     }
   }
 }
 </script>
 
 <style lang='stylus' scoped>
+  .border-bottom
+    &:before
+      border-color rgba(7, 17, 27, 0.1)
   .shopcart
     position fixed
     left 0
@@ -147,9 +215,9 @@ export default {
     z-index 50
     width 100%
     height .96rem
-    background #141d27
     .content
       display flex
+      background #141d27
       font-size 0
       .content-left
         flex 1
@@ -245,4 +313,72 @@ export default {
             border-radius 50%
             background rgb(0, 160, 220)
             transition all .4s linear
+    .shopcart-list
+      position absolute
+      top 0
+      left 0
+      z-index -1
+      width 100%
+      transform translate3d(0, -100%, 0)
+      &.fold-enter-active, &.fold-leave-active
+        transition all 0.5s
+      &.fold-enter, &.fold-leave-to
+        // opacity 0
+        transform translate3d(0, 0, 0)
+      .list-header
+        height .8rem
+        line-height .8rem
+        padding 0 .36rem
+        background #f3f5f7
+        border-bottom 2px solid rgba(7, 17, 27, 0.1)
+        .title
+          float left
+          font-size .28rem
+          font-weight 200
+          color rgb(7, 17, 27)
+        .empty
+          float right
+          font-size .24rem
+          color rgb(0, 160, 220)
+      .list-content
+        background #fff
+        padding 0 .36rem
+        max-height 217px
+        overflow hidden
+        .food-item
+          position relative
+          // height .96rem
+          padding .24rem 0
+          .name
+            font-size .28rem
+            color rgb(7, 17, 27)
+            line-height .48rem
+          .price-wrapper
+            position absolute
+            right 1.8rem
+            top .24rem
+            line-height .48rem
+            color rgb(240, 20, 20)
+            .price
+              font-size .2rem
+              font-weight normal
+              .num
+                font-size .28rem
+                font-weight 700
+          .cartcontrol-wrapper
+            position absolute
+            right 0
+            top .12rem
+  .list-mask
+    position fixed
+    top 0
+    left 0
+    width 100%
+    height 100%
+    background rgba(7, 17, 27, 0.6)
+    -webkit-backdrop-filter blur(10px)
+    &.fade-enter-active, &.fade-leave-active
+      transition opacity 0.5s
+    &.fade-enter, &.fade-leave-to
+      opacity 0
 </style>
