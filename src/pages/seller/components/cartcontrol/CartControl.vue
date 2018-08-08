@@ -20,12 +20,13 @@ export default {
     }
   },
   methods: {
-    addCart () {
+    addCart (event) {
       if (!this.food.count) {
         Vue.set(this.food, 'count', 1)
       } else {
         this.food.count++
       }
+      this.$emit('addcart', event.target)
     },
     decreaseCart () {
       if (this.food.count) {
@@ -44,14 +45,14 @@ export default {
     padding .12rem
     &.move-enter-active, &.move-leave-active
       // opacity 1
-      // transform translate3D(0, 0, 0)
+      // transform translate3d(0, 0, 0)
       transition all .4s linear
       .inner
         transition all .4s linear
         // transform rotate(0)
     &.move-enter, &.move-leave-to
       opacity 0
-      transform translate3D(24px, 0, 0)
+      transform translate3d(24px, 0, 0)
       .inner
         transform rotate(180deg)
     .inner

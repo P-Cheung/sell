@@ -15,6 +15,13 @@
         <div class="pay" :class="payClass">{{payDesc}}</div>
       </div>
     </div>
+    <div class="ball-wrapper">
+      <transition-group name="drop" @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter">
+        <div class="ball" v-for="(ball, index) in balls" :key="index" v-show="ball.show">
+          <div class="inner inner-hook"></div>
+        </div>
+      </transition-group>
+    </div>
   </div>
 </template>
 
@@ -35,6 +42,18 @@ export default {
       default () {
         return []
       }
+    }
+  },
+  data () {
+    return {
+      balls: [
+        {show: false},
+        {show: false},
+        {show: false},
+        {show: false},
+        {show: false}
+      ],
+      dropBalls: []
     }
   },
   computed: {
@@ -64,6 +83,57 @@ export default {
     },
     payClass () {
       return this.totalPrice < this.minPrice ? 'not-enough' : 'enough'
+    }
+  },
+  methods: {
+    addcart (el) {
+      let length = this.balls.length
+      for (let i = 0; i < length; i++) {
+        let ball = this.balls[i]
+        if (!ball.show) {
+          ball.el = el
+          ball.show = true
+          this.dropBalls.push(ball)
+          return
+        }
+      }
+    },
+    beforeEnter (el) {
+      let count = this.balls.length
+      while (count--) {
+        let ball = this.balls[count]
+        if (ball.show) {
+          let rect = ball.el.getBoundingClientRect()
+          let x = rect.left - 32
+          let y = -(window.innerHeight - rect.top - 22)
+          el.style.display = ''
+          el.style.webkitTransform = `translate3d(0, ${y}px, 0)`
+          el.style.transform = `translate3d(0, ${y}px, 0)`
+          let inner = el.getElementsByClassName('inner-hook')[0]
+          inner.style.webkitTransform = `translate3d(${x}px, 0, 0)`
+          inner.style.transform = `translate3d(${x}px, 0, 0)`
+        }
+      }
+    },
+    enter (el) {
+      console.log(el.offsetHeight) // 触发浏览器重绘
+      this.$nextTick(() => { // 复原初始状态
+        el.style.webkitTransform = 'translate3d(0, 0, 0)'
+        el.style.transform = 'translate3d(0, 0, 0)'
+        let inner = el.getElementsByClassName('inner-hook')[0]
+        inner.style.webkitTransform = 'translate3d(0, 0, 0)'
+        inner.style.transform = 'translate3d(0, 0, 0)'
+        // setTimeout(() => {
+        //   done()
+        // }, 400)
+      })
+    },
+    afterEnter (el) {
+      let ball = this.dropBalls.shift()
+      if (ball) {
+        ball.show = false
+        el.style.display = 'none'
+      }
     }
   }
 }
@@ -161,4 +231,18 @@ export default {
           &.enough
             background #00b43c
             color #fff
+    .ball-wrapper
+      .ball
+        position fixed
+        left .64rem
+        bottom .44rem
+        z-index 200
+        &.drop-enter-active
+          transition all 0.4s cubic-bezier(0.49,-0.29,0.75,0.41)
+          .inner
+            width .32rem
+            height .32rem
+            border-radius 50%
+            background rgb(0, 160, 220)
+            transition all .4s linear
 </style>
