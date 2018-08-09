@@ -25,6 +25,41 @@
             </div>
           </transition>
         </div>
+        <split v-show="food.info"></split>
+        <div class="info" v-show="food.info">
+          <h1 class="title">商品介绍</h1>
+          <p class="text">{{food.info}}</p>
+        </div>
+        <split v-show="food.ratings"></split>
+        <div class="rating" v-show="food.ratings">
+          <h1 class="title">商品评价</h1>
+          <rating-select :selectType="selectType"
+            :onlyContent="onlyContent"
+            :desc="desc"
+            :ratings="food.ratings"
+            @check="handelCheck"
+            @change="changeSelectType"
+          >
+          </rating-select>
+          <div class="rating-wrapper">
+            <div v-if="food.ratings && food.ratings.length">
+              <ul>
+                <li class="rating-item border-bottom" v-for="(rating,index) in ratings" :key="index">
+                  <div class="user">
+                    <span class="username">{{rating.username}}</span>
+                    <img class="avatar" :src="rating.avatar" width="12" height="12" />
+                  </div>
+                  <div class="time">{{rating.rateTime | formatDate}}</div>
+                  <div class="text"><span :class="{'icon-thumb_up':rating.rateType===0,'icon-thumb_down':rating.rateType===1}"></span>{{rating.text}}</div>
+                </li>
+              </ul>
+              <div v-show="!ratings.length" class="no-rating">无符合条件的评价</div>
+            </div>
+            <div class="no-rating" v-if="!food.ratings || !food.ratings.length">
+              暂无评价
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </transition>
@@ -32,19 +67,33 @@
 
 <script>
 import cartcontrol from '../cartcontrol/CartControl'
+import split from '../split/split'
+import RatingSelect from '../ratingSelect/RatingSelect'
 import BScroll from 'better-scroll'
 import Vue from 'vue'
+import {formatDate} from '@/common/js/date'
+
+const ALL = 2
 export default {
   name: 'Food',
   components: {
-    cartcontrol
+    cartcontrol,
+    split,
+    RatingSelect
   },
   props: {
     food: Object
   },
   data () {
     return {
-      showFlag: false
+      showFlag: false,
+      selectType: ALL,
+      onlyContent: false,
+      desc: {
+        positive: '推荐',
+        nagetive: '吐槽',
+        all: '全部'
+      }
     }
   },
   methods: {
@@ -66,6 +115,47 @@ export default {
     handdleBuy (event) {
       Vue.set(this.food, 'count', 1)
       this.$emit('buy', event.target)
+    },
+    handelCheck () {
+      this.onlyContent = !this.onlyContent
+      this.$nextTick(() => {
+        this.scroll.refresh()
+      })
+    },
+    changeSelectType (type) {
+      this.selectType = type
+      this.$nextTick(() => {
+        this.scroll.refresh()
+      })
+    }
+  },
+  computed: {
+    ratings () {
+      if (this.selectType === ALL) {
+        if (this.onlyContent) {
+          return this.food.ratings.filter(item => {
+            return item.text
+          })
+        } else {
+          return this.food.ratings
+        }
+      } else {
+        if (this.onlyContent) {
+          return this.food.ratings.filter(item => {
+            return item.rateType === this.selectType && item.text
+          })
+        } else {
+          return this.food.ratings.filter(item => {
+            return item.rateType === this.selectType
+          })
+        }
+      }
+    }
+  },
+  filters: {
+    formatDate (time) {
+      let date = new Date(time)
+      return formatDate(date, 'yyyy-MM-dd hh:mm')
     }
   }
 }
@@ -157,4 +247,64 @@ export default {
         opacity 0
       &.fade-enter-active, &.fade-leave-active
         transition all 0.2s
+  .info
+    padding .36rem
+    .title
+      font-size .28rem
+      color rgb(7, 17, 27)
+      line-height .28rem
+      margin-bottom .12rem
+    .text
+      padding 0 .16rem
+      font-size .24rem
+      font-weight 200
+      color rgb(77, 85, 93)
+      line-height .48rem
+  .rating
+    margin-top .36rem
+    .title
+      padding 0 .36rem
+      font-size .28rem
+      color rgb(7, 17, 27)
+      line-height .28rem
+    .rating-item
+      position relative
+      margin .32rem .36rem
+      font-size 0
+      .user
+        position absolute
+        top 0
+        right 0
+        .username
+          font-size .2rem
+          line-height .24rem
+          color rgb(147, 153, 159)
+          margin-right .12rem
+        .avatar
+          vertical-align top
+          border-radius 50%
+      .time
+        font-size .2rem
+        line-height .24rem
+        color rgb(147, 153, 159)
+      .text
+        margin-top .12rem
+        padding-bottom .32rem
+        font-size .24rem
+        color rgb(7, 17, 27)
+        line-height .32rem
+        .icon-thumb_up
+          font-size .24rem
+          line-height .48rem
+          color rgb(0, 160, 220)
+          margin-right .08rem
+        .icon-thumb_down
+          font-size .24rem
+          line-height .48rem
+          color rgb(147, 153, 159)
+          margin-right .08rem
+    .no-rating
+      margin .32rem .36rem
+      font-size .24rem
+      color rgb(147, 153, 159)
 </style>
