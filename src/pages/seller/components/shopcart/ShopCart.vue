@@ -373,6 +373,7 @@ export default {
     position fixed
     top 0
     left 0
+    z-index 40
     width 100%
     height 100%
     background rgba(7, 17, 27, 0.6)

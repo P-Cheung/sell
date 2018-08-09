@@ -19,7 +19,7 @@
         <li class="foodlist foodlist-hook" v-for="(item, index) in goods" :key="index">
           <h1 class="title border-left">{{item.name}}</h1>
           <ul>
-            <li class="food-item border-bottom" v-for="(food, index) in item.foods" :key="index">
+            <li class="food-item border-bottom" v-for="(food, index) in item.foods" :key="index" @click="selectfood(food)">
               <div class="icon">
                 <img width="57" height="57" :src="food.icon">
               </div>
@@ -42,6 +42,7 @@
       </ul>
     </div>
     <shopcart ref="shopcart" :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice" :selected-foods="selectedFoods"></shopcart>
+    <food :food="selectedfood" ref="food" @buy="handleAddCart"></food>
   </div>
 </template>
 
@@ -50,11 +51,13 @@ import axios from 'axios'
 import BScroll from 'better-scroll'
 import shopcart from '../shopcart/ShopCart'
 import CartControl from '../cartcontrol/CartControl'
+import Food from '../food/Food'
 export default {
   name: 'sellerGoods',
   components: {
     shopcart,
-    CartControl
+    CartControl,
+    Food
   },
   data () {
     return {
@@ -63,7 +66,8 @@ export default {
       seller: {},
       scrollHeight: [],
       scrollY: 0,
-      foodlist: []
+      foodlist: [],
+      selectedfood: {}
     }
   },
   computed: {
@@ -134,6 +138,10 @@ export default {
     },
     handleAddCart (target) {
       this.$refs.shopcart.addcart(target)
+    },
+    selectfood (food) {
+      this.selectedfood = food
+      this.$refs.food.show()
     }
   }
 }
