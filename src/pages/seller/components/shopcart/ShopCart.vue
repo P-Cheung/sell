@@ -189,7 +189,7 @@ export default {
       }
     },
     empty () {
-      this.selectedFoods.forEach(item => {
+      this.selectedFoods.forEach(item => { // 不应子组件修改props
         item.count = 0
       })
       this.fold = true

@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import Star from '@/common/star/Star'
+import Star from '../star/Star'
 export default {
   name: 'sellerHeader',
   components: {

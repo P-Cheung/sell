@@ -59,11 +59,13 @@ export default {
     CartControl,
     Food
   },
+  props: {
+    seller: Object
+  },
   data () {
     return {
       iconMap: ['decrease', 'discount', 'special', 'invoice', 'guarantee'],
       goods: [],
-      seller: {},
       scrollHeight: [],
       scrollY: 0,
       foodlist: [],
@@ -103,7 +105,6 @@ export default {
       res = res.data
       if (res.ret && res.data) {
         this.goods = res.data.goods
-        this.seller = res.data.seller
         this.$nextTick(() => { // 保证数据已获取并渲染
           this._initScroll()
           this._caculateHeight()
