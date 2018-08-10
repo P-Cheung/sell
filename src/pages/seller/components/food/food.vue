@@ -91,7 +91,7 @@ export default {
       onlyContent: false,
       desc: {
         positive: '推荐',
-        nagetive: '吐槽',
+        negative: '吐槽',
         all: '全部'
       }
     }

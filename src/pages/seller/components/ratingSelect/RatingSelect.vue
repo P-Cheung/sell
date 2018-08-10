@@ -7,8 +7,8 @@
       <span class="block positive" :class="{'on':selectType===0}" @click="changeSelectType(0)">
         {{desc.positive}}<span class="count">{{positives.length}}</span>
       </span>
-      <span class="block nagetive" :class="{'on':selectType===1}" @click="changeSelectType(1)">
-        {{desc.nagetive}}<span class="count">{{nagetives.length}}</span>
+      <span class="block negative" :class="{'on':selectType===1}" @click="changeSelectType(1)">
+        {{desc.negative}}<span class="count">{{negatives.length}}</span>
       </span>
     </div>
     <div class="switch" @click="handleCheck">
@@ -20,7 +20,7 @@
 
 <script>
 const POSITIVE = 0
-const NAGETIVE = 1
+const NEGATIVE = 1
 const ALL = 2
 export default {
   name: 'RatingSelect',
@@ -38,7 +38,7 @@ export default {
       default () {
         return {
           positive: '满意',
-          nagetive: '不满意',
+          negative: '不满意',
           all: '全部'
         }
       }
@@ -56,9 +56,9 @@ export default {
         return item.rateType === POSITIVE
       })
     },
-    nagetives () {
+    negatives () {
       return this.ratings.filter(item => {
-        return item.rateType === NAGETIVE
+        return item.rateType === NEGATIVE
       })
     }
   },
@@ -94,7 +94,7 @@ export default {
       &.on
         background rgb(0, 160, 220)
         color #fff
-    &.nagetive
+    &.negative
       background rgba(77, 85, 93, 0.2)
       &.on
         background rgb(77, 85, 93)
