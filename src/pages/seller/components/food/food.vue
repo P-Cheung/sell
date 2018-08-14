@@ -107,6 +107,7 @@ export default {
         } else {
           this.scroll.refresh()
         }
+        console.log('foodscroll-2')
       })
     },
     hide () {
